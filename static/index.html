@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Trust Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="glass-container header">
+        <h1>Evolution of Trust <span>Network Engine MVP</span></h1>
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">Generation Tick</span>
+                <span class="stat-value" id="tick-counter">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Nodes</span>
+                <span class="stat-value" id="node-counter">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Edges</span>
+                <span class="stat-value" id="edge-counter">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="glass-container canvas-wrapper">
+            <div id="graph-container"></div>
+        </div>
+
+        <div class="glass-container controls-panel">
+            <h2>Simulation Controls</h2>
+            
+            <div class="control-group">
+                <button class="btn btn-primary" id="btn-tick">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    Advance 1 Tick
+                </button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="control-group">
+                <label for="topology-select">Graph Topology</label>
+                <select id="topology-select" class="glass-input">
+                    <option value="ring">Ring Network</option>
+                    <option value="complete">Fully Connected</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="size-input">Population Size</label>
+                <input type="number" id="size-input" class="glass-input" value="12" min="3" max="50">
+            </div>
+
+            <div class="control-group">
+                <button class="btn btn-secondary" id="btn-reset">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                    Reset & Generate
+                </button>
+            </div>
+            
+            <div class="divider"></div>
+
+            <div class="legend">
+                <h3>Strategies</h3>
+                <div class="legend-item">
+                    <div class="color-swatch coop"></div>
+                    <span>Always Cooperate</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-swatch cheat"></div>
+                    <span>Always Cheat</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-swatch copycat"></div>
+                    <span>Copycat (Tit-for-Tat)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-swatch grudger"></div>
+                    <span>Grudger (Grim Trigger)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-swatch detective"></div>
+                    <span>Detective</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tooltip for nodes -->
+    <div id="tooltip" class="glass-tooltip"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
