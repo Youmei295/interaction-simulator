@@ -1,4 +1,4 @@
-package v1_static
+package v2_evo
 
 import (
 	"math/rand"
@@ -6,49 +6,15 @@ import (
 
 	"interaction-simulator/internal/core"
 	"interaction-simulator/internal/strategy"
-	"interaction-simulator/internal/topology"
 )
 
-// Engine is the v1 implementation of the Simulator interface.
-// It runs a static graph where nodes interact but do not evolve.
-type Engine struct {
-	graph *core.Graph
-}
-
-func NewEngine() *Engine {
-	// Initialize with a default graph
-	defaultConfig := core.SimConfig{
-		Topology: "ring",
-		Size:     12,
-		Distribution: map[string]float64{
-			"AlwaysCooperator": 1.0, // Default to something safe
-		},
-	}
-	return &Engine{
-		graph: topology.GenerateRingGraph(defaultConfig),
-	}
-}
-
-func (e *Engine) GetState() *core.Graph {
-	return e.graph
-}
-
-func (e *Engine) Reset(config core.SimConfig) {
-	if config.Topology == "complete" {
-		e.graph = topology.GenerateFullyConnectedGraph(config)
-	} else {
-		e.graph = topology.GenerateRingGraph(config)
-	}
-}
-
-func (e *Engine) AdvanceTick() {
-	e.graph.Mu.Lock()
-	defer e.graph.Mu.Unlock()
-
+// processInteractions handles Phase 1 and 2: Queue generation, strategy evaluation,
+// and payoff matrix calculation.
+func processInteractions(graph *core.Graph) {
 	// Phase 1: Queue Generation
 	type pair struct{ A, B string }
-	queue := make([]pair, len(e.graph.Edges))
-	for i, edge := range e.graph.Edges {
+	queue := make([]pair, len(graph.Edges))
+	for i, edge := range graph.Edges {
 		queue[i] = pair{edge.NodeA, edge.NodeB}
 	}
 
@@ -56,7 +22,7 @@ func (e *Engine) AdvanceTick() {
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(queue), func(i, j int) { queue[i], queue[j] = queue[j], queue[i] })
 
-	// We calculate all actions first to ensure simultaneous evaluation
+	// Calculate all actions first for simultaneous evaluation
 	type interaction struct {
 		nodeA, nodeB     string
 		actionA, actionB core.Action
@@ -64,8 +30,8 @@ func (e *Engine) AdvanceTick() {
 	interactions := make([]interaction, len(queue))
 
 	for i, p := range queue {
-		nodeA := e.graph.Nodes[p.A]
-		nodeB := e.graph.Nodes[p.B]
+		nodeA := graph.Nodes[p.A]
+		nodeB := graph.Nodes[p.B]
 
 		stratA := strategy.Get(nodeA.Strategy)
 		stratB := strategy.Get(nodeB.Strategy)
@@ -83,8 +49,8 @@ func (e *Engine) AdvanceTick() {
 
 	// Phase 3: State Resolution & Payoff Matrix
 	for _, intx := range interactions {
-		nodeA := e.graph.Nodes[intx.nodeA]
-		nodeB := e.graph.Nodes[intx.nodeB]
+		nodeA := graph.Nodes[intx.nodeA]
+		nodeB := graph.Nodes[intx.nodeB]
 
 		var scoreA, scoreB float64
 
@@ -104,6 +70,4 @@ func (e *Engine) AdvanceTick() {
 		stratA.ApplyOutcome(nodeA, intx.nodeB, intx.actionA, intx.actionB, scoreA)
 		stratB.ApplyOutcome(nodeB, intx.nodeA, intx.actionB, intx.actionA, scoreB)
 	}
-
-	e.graph.Tick++
 }

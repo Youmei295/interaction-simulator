@@ -5,7 +5,8 @@ This document outlines the core rules of the Interaction Simulator and tracks th
 
 ---
 
-## Version 0.1.0: Base Graph-Network Prisoner's Dilemma (Current MVP)
+## Version 0.1.0: Base Graph-Network Prisoner's Dilemma
+*(Legacy MVP)*
 
 ### Core Mechanics
 - **Environment**: A static graph network. Nodes represent agents, and edges represent communication lines.
@@ -32,12 +33,20 @@ The game uses a standard Iterated Prisoner's Dilemma payoff structure:
 
 ---
 
+## Version 0.2.0: Evolutionary Mechanics & Lifespans (Current MVP)
+
+### Core Mechanics Added
+- **Automated Playback**: Simulation ticks can be advanced manually or played automatically with adjustable speeds.
+- **Aging & Lifespan**: Nodes age with each tick. The probability of death follows a scaled Sigmoid function mimicking natural life expectancy (low mortality in youth, exponential increase around the median lifespan, converging towards 100% at infinity).
+- **Death & Replacement**: When a node "dies", its memory, score, and age are reset to zero. It is immediately replaced.
+- **Distribution Reproduction**: Replacements are assigned a new strategy based on an exact probability distribution set by the user at the start of the simulation (e.g., 33% Cooperator, 33% Cheater, 34% Copycat). This maintains a constant total population size while enforcing the chosen strategy ratio.
+
+---
+
 ## Planned Future Variations
 
-### Version 0.2.x: Evolutionary Mechanics & Generations
-* **Generations**: The concept of continuous ticks is grouped into discrete generations (e.g., a generation = 10 ticks).
-* **Reproduction (Fitness)**: At the end of a generation, nodes with higher cumulative scores reproduce or spread their strategy to neighboring nodes.
-* **Elimination**: Nodes with the lowest scores have their strategies replaced by the highest-performing strategies in their local neighborhood or the global population.
+### Version 0.3.x: Fitness-Based Selection
+* **Fitness Reproduction**: Moving beyond the static distribution spawner of 0.2.0, nodes will begin to reproduce based on their *Score* (Fitness). High-scoring strategies will spread to neighbors, while low-scoring nodes will be eliminated.
 
 ### Version 0.3.x: Noise and Miscommunication
 * **Execution Errors**: Introducing a small probability error rate (e.g., 5%) where an intended action is accidentally flipped (intending to Cooperate but accidentally Defecting).

@@ -6,12 +6,12 @@ import (
 	"net/http"
 
 	"interaction-simulator/internal/api"
-	"interaction-simulator/internal/simulator/v1_static"
+	"interaction-simulator/internal/simulator/v2_evo"
 )
 
 func main() {
-	// Initialize the simulation engine (v1_static for now)
-	engine := v1_static.NewEngine()
+	// Initialize the simulation engine (v2_evo with lifespan and reproduction)
+	engine := v2_evo.NewEngine()
 
 	// Initialize the API server
 	apiServer := api.NewServer(engine)
@@ -24,7 +24,7 @@ func main() {
 	fs := http.FileServer(http.Dir("../../static")) // Note relative path from cmd/server to static/
 	mux.Handle("/", fs)
 
-	port := 8081
+	port := 8082
 	fmt.Printf("Server starting on http://localhost:%d\n", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), mux))
 }

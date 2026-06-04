@@ -15,7 +15,9 @@ The project has recently been refactored into a highly modular architecture to s
 - `cmd/server/main.go`: The main entry point that wires the application together.
 - `internal/core/`: Contains the fundamental data structures (`Node`, `Edge`, `Graph`, `Action`).
 - `internal/strategy/`: Implements the Strategy Registry pattern. New strategies are added here as isolated files, preventing the need to modify core logic.
-- `internal/simulator/`: Contains the actual simulation engines. Currently holds `v1_static` (a basic engine where nodes just accumulate points). Future engines (like `v2_evo` with reproduction/elimination) will live here alongside it.
+- `internal/simulator/`: Contains the simulation engines. 
+  - `v1_static`: A legacy engine where nodes just accumulate points on a fixed graph.
+  - `v2_evo`: The current active engine featuring automated playback, node lifespans (via a Sigmoid probability curve), and dynamic strategy reproduction based on user-defined distributions.
 - `internal/topology/`: Helpers for generating different network shapes (Ring, Fully Connected, etc.).
 - `internal/api/`: HTTP REST handlers for the frontend.
 - `static/`: A custom-built, glassmorphic frontend utilizing D3.js for physics-based force-directed graph rendering.
@@ -29,4 +31,4 @@ The project has recently been refactored into a highly modular architecture to s
 cd cmd/server
 go run main.go
 ```
-Then navigate to `http://localhost:8081` in your browser.
+Then navigate to `http://localhost:8082` in your browser.

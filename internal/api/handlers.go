@@ -53,17 +53,28 @@ func (s *Server) handleReset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	topology := r.URL.Query().Get("topology")
-	sizeStr := r.URL.Query().Get("size")
-	size := 12
-	if sz, err := strconv.Atoi(sizeStr); err == nil && sz > 0 {
-		size = sz
+	var config core.SimConfig
+	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
+		// Fallback to URL query params if JSON is not provided (for backward compatibility)
+		config.Topology = r.URL.Query().Get("topology")
+		sizeStr := r.URL.Query().Get("size")
+		config.Size = 12
+		if sz, err := strconv.Atoi(sizeStr); err == nil && sz > 0 {
+			config.Size = sz
+		}
+	}
+
+	// Ensure distribution exists if not provided
+	if config.Distribution == nil {
+		config.Distribution = map[string]float64{
+			"AlwaysCooperator": 1.0,
+		}
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	
-	s.Sim.Reset(topology, size)
+	s.Sim.Reset(config)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(s.Sim.GetState())
