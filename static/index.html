@@ -140,6 +140,24 @@
     <!-- Tooltip for nodes -->
     <div id="tooltip" class="glass-tooltip"></div>
 
-    <script src="app.js"></script>
+    <script src="wasm_exec.js"></script>
+    <script>
+        // Initialize WebAssembly before running the main app
+        const go = new Go();
+        WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+            go.run(result.instance);
+            
+            // Load the main app dynamically after Wasm is ready
+            const appScript = document.createElement('script');
+            appScript.src = "app.js";
+            document.body.appendChild(appScript);
+        }).catch(err => {
+            console.error("Failed to load WebAssembly:", err);
+            // Fallback for local development if wasm fails (load app anyway to use API)
+            const appScript = document.createElement('script');
+            appScript.src = "app.js";
+            document.body.appendChild(appScript);
+        });
+    </script>
 </body>
 </html>

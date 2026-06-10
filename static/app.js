@@ -57,8 +57,16 @@ window.addEventListener('resize', () => {
 // Fetch and Render State
 async function fetchState() {
     try {
-        const res = await fetch(`${API_BASE}/state`);
-        const data = await res.json();
+        let data;
+        if (typeof window.sim_getState === 'function') {
+            // Using WebAssembly
+            const stateStr = window.sim_getState();
+            data = JSON.parse(stateStr);
+        } else {
+            // Fallback to API
+            const res = await fetch(`${API_BASE}/state`);
+            data = await res.json();
+        }
         updateViz(data);
     } catch (e) {
         console.error("Failed to fetch state", e);
@@ -69,8 +77,16 @@ async function fetchState() {
 async function advanceTick() {
     btnTick.disabled = true;
     try {
-        const res = await fetch(`${API_BASE}/tick`, { method: 'POST' });
-        const data = await res.json();
+        let data;
+        if (typeof window.sim_advanceTick === 'function') {
+            // Using WebAssembly
+            const stateStr = window.sim_advanceTick();
+            data = JSON.parse(stateStr);
+        } else {
+            // Fallback to API
+            const res = await fetch(`${API_BASE}/tick`, { method: 'POST' });
+            data = await res.json();
+        }
         
         // Flash links to show interaction
         svg.selectAll(".link").classed("active", true);
@@ -143,14 +159,22 @@ async function resetSimulation() {
     pauseSimulation();
 
     try {
-        const res = await fetch(`${API_BASE}/reset`, { 
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(config)
-        });
-        const data = await res.json();
+        let data;
+        if (typeof window.sim_reset === 'function') {
+            // Using WebAssembly
+            const stateStr = window.sim_reset(JSON.stringify(config));
+            data = JSON.parse(stateStr);
+        } else {
+            // Fallback to API
+            const res = await fetch(`${API_BASE}/reset`, { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(config)
+            });
+            data = await res.json();
+        }
         updateViz(data);
     } catch (e) {
         console.error("Failed to reset", e);
