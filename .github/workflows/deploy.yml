@@ -37,9 +37,6 @@ jobs:
         run: |
           # Build the WebAssembly binary
           GOOS=js GOARCH=wasm go build -o ./static/main.wasm ./cmd/wasm
-          
-          # Copy the Go WebAssembly bridge into the static directory
-          cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" ./static/
 
       - name: Upload static files as artifact
         uses: actions/upload-pages-artifact@v3
